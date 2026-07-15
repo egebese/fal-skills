@@ -1,3 +1,8 @@
+---
+name: fal-support
+description: Give concise fal.ai model selection, workflow, cost, and troubleshooting guidance for image, video, audio, avatar, and 3D requests.
+---
+
 # fal Support
 
 Use this skill when someone needs help choosing a fal model, planning a simple
