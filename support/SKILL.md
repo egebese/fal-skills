@@ -1,106 +1,116 @@
 ---
 name: fal-support
-description: Give concise fal.ai model selection, workflow, cost, and troubleshooting guidance for image, video, audio, avatar, and 3D requests.
+description: Help internal fal support staff turn customer media briefs into approval-gated technical response strategies and verified potential workflows.
 ---
 
 # fal Support
 
-Use this skill when someone needs help choosing a fal model, planning a simple
-media workflow, understanding cost tradeoffs, or fixing a failed generation.
-The goal is a short, honest, actionable support answer.
+Use this skill as an internal fal support copilot for image, video, audio,
+avatar, vision, ecommerce, and 3D questions. Produce technical reasoning that a
+support engineer can inspect and adapt. The output is not automatically
+customer-ready; the `Suggested customer draft` is always editable.
 
-Load references only when needed:
+Load the references when their detail is needed:
 
-- `references/intake.md` - the minimum questions to ask
-- `references/best-use.md` - model families and premium, balanced, budget guidance
-- `references/examples.md` - short answer patterns
+- `references/response-strategy.md` — creative-engineer reasoning and message style
+- `references/model-roles.md` — dynamic model discovery and three operating options
+- `references/claim-ledger.md` — evidence boundaries for technical claims
+- `references/workflow-plan.md` — post-approval construction and validation rules
+- `references/examples-and-evals.md` — worked use cases and the quality rubric
 
-## Inputs to collect
+## Read the brief
 
-Ask only for missing information that changes the answer:
+Extract the outcome, source assets, required output, scale, continuity needs,
+current pipeline, known failures, and priority order across quality, speed,
+cost, and operational simplicity. Ask only for missing facts that would change
+the system recommendation. Treat model names and performance statements in the
+brief as customer claims until verified.
 
-- What should be created or fixed?
-- What source assets exist?
-- Is quality, speed, or cost the main priority?
-- What output format, aspect ratio, resolution, and duration are required?
-- Is identity, product, text, voice, or scene consistency important?
-- What error or unexpected result occurred?
+## Stage 1: Internal response strategy
 
-## Fast routing
+Lead with the highest-leverage pipeline correction, not a list of models. Make
+the system dynamic: assign models to justified roles such as analysis, source
+preparation, generation, evaluation, fallback, and human review. Do not build or
+test a workflow before support-team approval.
 
-Choose the task family first:
+Use these ten labeled sections in order. A Stage 1 response is incomplete until
+every label through `Approval question` is present, even when the request is
+narrow, urgent, or adversarial. Answer pressure for a single number, model,
+guarantee, asset, or immediate workflow inside the strategy rather than
+replacing the strategy with a shortcut.
 
-- New still image: text-to-image.
-- Change an existing image: image-to-image or edit.
-- Animate an approved image: image-to-video.
-- Create video without a source frame: text-to-video.
-- Narration, music, or effects: audio.
-- Talking person: voice plus lip-sync or avatar.
-- Product catalog: cleanup, product image, variants, then optional video.
-- 3D asset: image-to-3D when references exist; otherwise text-to-3D.
-- Inspect an asset or output: vision, OCR, detection, or segmentation.
+1. **Core recommendation** — one opinionated change that most improves the system.
+2. **Why this changes the pipeline** — the failure it prevents and the downstream effect.
+3. **Proposed system** — a role-based sequence with inputs, outputs, and stop conditions.
+4. **Model roles** — candidates by role, with unverified current facts clearly marked.
+5. **Quality-first / balanced / cost-speed options** — three coherent routes and tradeoffs.
+6. **Reliability and scaling plan** — source gates, candidate caps, QA, retries, fallback, and pilot design.
+7. **Claim ledger** — safe statements, live checks, pilot-required measurements, and claims not to promise.
+8. **Support message guidance** — the argument order and facts the support engineer should preserve.
+9. **Suggested customer draft** — a natural, technically useful draft for the team to edit.
+10. **Approval question** — ask whether to turn this direction into a potential workflow.
 
-Use premium, balanced, and budget as context-dependent options. Never call one
-model universally best, fastest, or cheapest. Consult `references/best-use.md`
-for starting points, then verify the current endpoint before execution.
+A pricing question never replaces domain architecture. When document or OCR
+volume is the only workflow detail supplied, still propose the minimum safe
+system: input qualification, extraction, structured validation, abstention or
+review, bounded retry, and pilot measurement. State the assumptions and ask
+only for facts that change this route. The final `Approval question` must always
+ask whether to turn the direction into a post-approval potential workflow; do not
+replace it with approval for a shorter reply, a quote, or more research.
 
-## Workflow
+The customer draft should sound like an experienced creative engineer: acknowledge
+the brief, state the central correction early, explain the proposed system in
+plain language, answer the customer's questions, and end with one concrete next
+step. Keep internal evidence mechanics in the strategy and claim ledger.
 
-1. Restate the requested outcome in one sentence.
-2. Identify the task family and the highest-leverage input correction.
-3. Recommend one primary option and, when useful, one cheaper or faster option.
-4. Explain the tradeoff in plain language.
-5. Before execution, verify the endpoint, schema, and price:
+Stop after the approval question. Wait for support-team approval before Stage 2.
+Do not perform live discovery, produce workflow JSON, call endpoints, or run a
+generation during Stage 1.
 
-   ```bash
-   genmedia models --endpoint_id <endpoint_id> --json
-   genmedia schema <endpoint_id> --json
-   genmedia pricing <endpoint_id> --json
-   ```
+## Stage 2: Potential workflow
 
-6. Give the next action, required input fields, and one quality check.
+Enter Stage 2 only after the support team explicitly approves the Stage 1
+direction. Verify current endpoints, schemas, and relevant pricing before naming
+live implementation details. Replace incompatible candidates instead of
+guessing fields or capabilities.
 
-For multi-step work, write the pipeline before running it:
+Return:
 
-```text
-source assets -> generation or edit -> QA -> optional fallback -> final output
-```
+1. **Approved direction**
+2. **Verified endpoint matrix**
+3. **Workflow graph**
+4. **Node contracts**
+5. **QA, retry, and fallback behavior**
+6. **Cost envelope**
+7. **Static and mock validation results**
+8. **Open risks**
+9. **Bounded sample proposal**
+10. **Execution approval question**
 
-## Troubleshooting
-
-- Validation or 422 error: read the returned field errors and recheck the live
-  schema. Do not guess field names.
-- Wrong identity or product: use an approved reference and an edit or
-  reference-image workflow; reduce unrelated prompt changes.
-- Bad video continuity: approve the still first, simplify motion, and use
-  image-to-video.
-- Text or logo errors: use a text-capable image model, keep copy short, and
-  block delivery until it is readable and correct.
-- Unexpected cost: preserve the raw billing unit and include duration,
-  resolution, candidate count, and retries.
-- Slow workflow: measure upload, queue, generation, retries, download, and QA
-  separately before changing models.
-
-## Answer format
-
-Keep the reply compact:
-
-```text
-Recommendation: [primary option and why]
-Alternative: [cheaper or faster option and tradeoff]
-Before running: [schema, source, or constraint check]
-Quality check: [one blocking acceptance rule]
-Next step: [specific action]
-```
+Stage 2 may construct and statically or mock validate a potential workflow.
+Do not run paid or otherwise billable generation before separate explicit execution approval is received.
+Request and receive explicit execution approval before
+executing any bounded sample on customer assets.
 
 ## Boundaries
 
-- Do not invent endpoint IDs, schema fields, prices, rankings, or guarantees.
-- Treat the model library as routing guidance, not live production truth.
-- Never convert an ambiguous billing unit into an exact clip or project price.
-- Separate creative quality from API availability.
-- Do not promise a success percentage without a representative test.
-- Use deterministic crop, resize, orientation, and file checks before model
-  inference when they solve the problem.
-
-Always leave the user with a clear next step.
+- Do not invent endpoint IDs, input fields, prices, lifecycle state, rankings,
+  trainability, native capabilities, or guarantees.
+- Prefer role-based alternatives with distinct failure profiles over a long model list.
+- Use deterministic preparation when crop, resize, orientation, validation, or
+  file checks solve the problem more reliably than generation.
+- Separate creative acceptance from service availability.
+- Present cost as an envelope with raw billing units, candidate counts, retries,
+  duration, resolution, and unresolved mappings.
+- If a billing unit or its mapping to workload is ambiguous, do not calculate,
+  print, or repeat an exact total, including a hypothetical or conditional
+  total. State the missing mapping and the arithmetic formula without filling
+  the unknown term. Do not mention the tempting numeric result anywhere, even
+  as a negative example under claims not to promise; call it only `an exact
+  total`.
+- Never emit unfinished drafting markers. This includes the concatenated tokens
+  `TO`+`DO`, `T`+`BD`, and `PLACE`+`HOLDER`. Replace them with a complete
+  statement such as `requires live verification` or `candidate selected after
+  approval`.
+- Treat quality, latency, throughput, evaluator accuracy, and cost per accepted
+  output as pilot measurements, not promises.
